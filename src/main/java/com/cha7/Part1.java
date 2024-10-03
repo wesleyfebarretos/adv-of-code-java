@@ -63,6 +63,26 @@ public class Part1 {
             }
         }
 
+        Integer joker = strengthMap.get('J');
+
+        int maxStrength = 5;
+
+        if(joker != null && joker != maxStrength) {
+            strengthMap.remove('J');
+
+            int greaterCardValue = Collections.max(strengthMap.values());
+
+            for (Map.Entry<Character, Integer> entry : strengthMap.entrySet()) {
+                char key = entry.getKey();
+                Integer value = entry.getValue();
+
+                if(value == greaterCardValue) {
+                    strengthMap.put(key, strengthMap.get(key) + joker);
+                    break;
+                }
+            }
+        }
+
         int maxEquals = Collections.max(strengthMap.values());
         int mapSize = strengthMap.keySet().size();
 
@@ -89,16 +109,16 @@ public class Part1 {
         priorityCardsMap.put('A', 10);
         priorityCardsMap.put('K', 9);
         priorityCardsMap.put('Q', 8);
-        priorityCardsMap.put('J', 7);
-        priorityCardsMap.put('T', 6);
-        priorityCardsMap.put('9', 5);
-        priorityCardsMap.put('8', 4);
-        priorityCardsMap.put('7', 3);
-        priorityCardsMap.put('6', 2);
-        priorityCardsMap.put('5', 1);
-        priorityCardsMap.put('4', -1);
-        priorityCardsMap.put('3', -2);
-        priorityCardsMap.put('2', -3);
+        priorityCardsMap.put('T', 7);
+        priorityCardsMap.put('9', 6);
+        priorityCardsMap.put('8', 5);
+        priorityCardsMap.put('7', 4);
+        priorityCardsMap.put('6', 3);
+        priorityCardsMap.put('5', 2);
+        priorityCardsMap.put('4', 0);
+        priorityCardsMap.put('3', -1);
+        priorityCardsMap.put('2', -2);
+        priorityCardsMap.put('J', -3);
 
         for(int i = 0; i < hand1.length(); i++) {
             int strengthCard1 = priorityCardsMap.get(hand1.charAt(i));
