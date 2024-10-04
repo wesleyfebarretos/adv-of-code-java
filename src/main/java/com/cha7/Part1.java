@@ -3,6 +3,8 @@ package com.cha7;
 import com.utils.Utils;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 public class Part1 {
     public static final int FIVE_OF_A_KIND = 7;
@@ -17,17 +19,25 @@ public class Part1 {
         List<String> file = Utils.readLine("cha7/input.txt");
 
         Map<String, Integer> handsBidMap = new HashMap<>();
-        List<String> hands = new ArrayList<>();
 
-        for(String line:file) {
-            String[] handBid = line.split(" ");
-            String hand = handBid[0];
-            String bid = handBid[1];
-            handsBidMap.put(hand, Integer.parseInt(bid));
-            hands.add(hand);
-        }
+        AtomicInteger index = new AtomicInteger();
 
-        hands.sort((hand1, hand2) -> {
+        int totalWinnings = file.stream()
+            .map(line -> {
+                String[] handBid = line.split(" ");
+                String hand = handBid[0];
+                String bid = handBid[1];
+                handsBidMap.put(hand, Integer.parseInt(bid));
+                return hand;
+            })
+            .sorted(sortHand())
+            .reduce(0, (accum, hand) -> accum + handsBidMap.get(hand) * index.incrementAndGet(), Integer::sum);
+
+        System.out.println(totalWinnings);
+    }
+
+    public static Comparator<String> sortHand() {
+        return (String hand1, String hand2) -> {
             int hand1Strength = getHandStrength(hand1);
             int hand2Strength = getHandStrength(hand2);
 
@@ -38,30 +48,13 @@ public class Part1 {
             String winnerHand = findWinnerFromStrengthCollision(hand1, hand2);
 
             return winnerHand.equals(hand1) ? 1 : -1;
-        });
-
-        int totalWinnings = 0;
-
-        for(int i = 0; i < hands.size(); i++) {
-            int bid = handsBidMap.get(hands.get(i));
-
-            totalWinnings += bid * (i + 1);
-        }
-
-        System.out.println(totalWinnings);
+        };
     }
 
     public static int getHandStrength(String hand) {
-        Map<Character, Integer> strengthMap = new HashMap<>();
-
-        for(char c:hand.toCharArray()) {
-            Integer strength = strengthMap.get(c);
-            if(strength == null) {
-                strengthMap.put(c, 1);
-            } else {
-                strengthMap.put(c, ++strength);
-            }
-        }
+        Map<Character, Integer> strengthMap = hand.chars()
+            .mapToObj(c -> (char) c)
+            .collect(Collectors.groupingBy(c -> c, Collectors.summingInt(c -> 1)));
 
         int maxEquals = Collections.max(strengthMap.values());
         int mapSize = strengthMap.keySet().size();
