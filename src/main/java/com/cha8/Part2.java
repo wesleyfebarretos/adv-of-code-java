@@ -23,8 +23,6 @@ public class Part2 {
 
         Long steps = findStartingNodes(nodeMap).stream()
             .map(toSteps(instructions, nodeMap))
-            .toList()
-            .stream()
             .map(Long::valueOf)
             .reduce(1L, calcLCM());
 
